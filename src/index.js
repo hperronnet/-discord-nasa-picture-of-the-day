@@ -1,7 +1,7 @@
 require('dotenv').config({ path: '../.env' });
 const Discord = require('discord.js');
 
-const { TOKEN } = process.env;
+const { BOT_TOKEN } = process.env;
 
 const intents = [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES];
 const client = new Discord.Client({ intents });
@@ -12,4 +12,4 @@ client.events = new Discord.Collection();
 	require(`./handlers/${file}`)(Discord, client);
 });
 
-client.login(TOKEN);
+client.login(BOT_TOKEN);
