@@ -3,7 +3,7 @@ const fs = require('fs');
 module.exports = (Discord, client) => {
 	const loadDir = (dir) => {
 		const eventFiles = fs
-			.readdirSync(`./events/${dir}`)
+			.readdirSync(`src/events/${dir}`)
 			.filter((file) => file.endsWith('.js'));
 
 		for (const file of eventFiles) {
