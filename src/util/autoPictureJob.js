@@ -26,7 +26,7 @@ const startAutoPicture = (message) => {
     if (!isJobRunning) {
         lastMessage = message;
         message.channel.send(
-            `I'll send you the Nasa Astronomy Picture of the Day every day at 8:00AM. To stop, type \`${PREFIX}autopod false\`.`
+            `I'll send you the Nasa Astronomy Picture of the Day every day at 8:00AM. To stop, type \`${PREFIX}autopod stop\`.`
         );
         autoPictureJob.start();
         isJobRunning = true;
