@@ -1,49 +1,50 @@
-const CronJob = require("cron").CronJob;
+const CronJob = require('cron').CronJob;
 const { PREFIX } = process.env;
-const { sendPictureOfTheDay } = require("../util/sendPictureOfTheDay.js");
+const { sendPictureOfTheDay } = require('../util/sendPictureOfTheDay.js');
 
 let autoPictureJob;
-let isJobRunning;
-let lastMessage;
+let isJobRunning = new Map();
+let lastMessage = new Map();
 
 const initialiseAutoPictureJob = () => {
     autoPictureJob = new CronJob(
-        "00 00 8 * * *",
+        '00 00 8 * * *',
         () => {
-            if (lastMessage) {
-                sendPictureOfTheDay(lastMessage, []);
-            }
+            lastMessage.forEach((server, guildId) => {
+                if (isJobRunning.get(guildId)) {
+                    console.log(`Sending Nasa Astronomy Picture of the Day for server ${guildId}`);
+                    sendPictureOfTheDay(server, []);
+                }
+            });
         },
         null,
-        false,
-        "America/New_York"
+        true,
+        'America/New_York'
     );
-
-    isJobRunning = false;
 };
 
 const startAutoPicture = (message) => {
-    if (!isJobRunning) {
-        lastMessage = message;
+    if (!isJobRunning.get(message.guildId)) {
+        lastMessage.set(message.guildId, message);
+        isJobRunning.set(message.guildId, true);
         message.channel.send(
             `I'll send you the Nasa Astronomy Picture of the Day every day at 8:00AM. To stop, type \`${PREFIX}autopod stop\`.`
         );
-        autoPictureJob.start();
-        isJobRunning = true;
     } else {
         message.channel.send(
-            `\`${PREFIX}autopod\` is already active in the channel ${lastMessage.channel}.`
+            `\`${PREFIX}autopod\` is already active in the channel ${
+                lastMessage.get(message.guildId).channel
+            }.`
         );
     }
 };
 
 const stopAutoPicture = (message) => {
-    if (isJobRunning) {
+    if (isJobRunning.get(message.guildId)) {
         message.channel.send(
             "I won't send you the Nasa Astronomy Picture of the Day anymore."
         );
-        isJobRunning = false;
-        autoPictureJob.stop();
+        isJobRunning.set(message.guildId, false);
     } else {
         message.channel.send(`\`${PREFIX}autopod\` is not running.`);
     }
