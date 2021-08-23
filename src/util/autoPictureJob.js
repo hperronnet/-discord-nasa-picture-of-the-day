@@ -28,7 +28,7 @@ const initialiseAutoPictureJob = () => {
 
 const startAutoPicture = (server) => {
     if (!isJobRunning.get(server.guildId)) {
-        lastMessage.set(server.guildId, message);
+        lastMessage.set(server.guildId, server);
         isJobRunning.set(server.guildId, true);
 
         const messageCommandActive = `I'll send you the Nasa Astronomy Picture of the Day every day at 8:00AM. To stop, type \`${PREFIX}autopod stop\`.`;
