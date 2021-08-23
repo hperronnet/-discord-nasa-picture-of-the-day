@@ -3,20 +3,20 @@ const { getAstronomyPictureOfTheDay } = require('../api.js');
 const moment = require('moment');
 const { isValidDate } = require('../util/dateUtil.js');
 const { PREFIX } = process.env;
+const { sendMessage, sendEmbedMessage } = require('./messageUtil.js');
 
 const sendPictureOfTheDay = async (server, args) => {
     const date = args.length === 0 ? moment().format('YYYY-MM-DD') : args[0];
     if (!isValidDate(date.toString())) {
-        server.channel.send(
-            `The given parameter is invalid. Type \`${PREFIX}help pod\` for more details.`
-        );
+        const messageInvalidParameter = `The given parameter is invalid. Type \`${PREFIX}help pod\` for more details.`;
+        sendMessage(server, messageInvalidParameter);
         return;
     }
 
     const res = await getAstronomyPictureOfTheDay(date);
 
     if (res.code !== 200) {
-        server.channel.send(res.msg);
+        sendMessage(server, res.msg);
         return;
     }
 
@@ -31,7 +31,7 @@ const sendPictureOfTheDay = async (server, args) => {
         .setImage(res.hdurl)
         .setFooter(footer);
 
-    server.channel.send({ embeds: [messageResponse] });
+    sendEmbedMessage(server, messageResponse);
 };
 
 module.exports = { sendPictureOfTheDay };

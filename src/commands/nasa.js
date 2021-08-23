@@ -1,12 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const fs = require('fs');
 const { PREFIX } = process.env;
+const { sendMessage } = require('../util/messageUtil.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('nasa')
         .setDescription('shows the list of all commands.'),
-    async execute(message, args, client) {
+    async execute(server, args, client) {
         let commandString = 'These are the supported commands: \n\n';
 
         client.commands.forEach((command) => {
@@ -15,6 +15,6 @@ module.exports = {
 
         commandString += `\nType \`${PREFIX}help commandName\` for a detailed explanation about a command. Ex: \`!help pod\`.`;
 
-        message.channel.send(commandString);
+        sendMessage(server, commandString);
     },
 };

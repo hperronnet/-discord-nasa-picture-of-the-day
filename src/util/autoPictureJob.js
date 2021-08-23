@@ -1,6 +1,7 @@
 const CronJob = require('cron').CronJob;
 const { PREFIX } = process.env;
 const { sendPictureOfTheDay } = require('../util/sendPictureOfTheDay.js');
+const { sendMessage } = require('../util/messageUtil.js');
 
 let autoPictureJob;
 let isJobRunning = new Map();
@@ -12,7 +13,9 @@ const initialiseAutoPictureJob = () => {
         () => {
             lastMessage.forEach((server, guildId) => {
                 if (isJobRunning.get(guildId)) {
-                    console.log(`Sending Nasa Astronomy Picture of the Day for server ${guildId}`);
+                    console.log(
+                        `Sending Nasa Astronomy Picture of the Day for server ${guildId}`
+                    );
                     sendPictureOfTheDay(server, []);
                 }
             });
@@ -23,30 +26,31 @@ const initialiseAutoPictureJob = () => {
     );
 };
 
-const startAutoPicture = (message) => {
-    if (!isJobRunning.get(message.guildId)) {
-        lastMessage.set(message.guildId, message);
-        isJobRunning.set(message.guildId, true);
-        message.channel.send(
-            `I'll send you the Nasa Astronomy Picture of the Day every day at 8:00AM. To stop, type \`${PREFIX}autopod stop\`.`
-        );
+const startAutoPicture = (server) => {
+    if (!isJobRunning.get(server.guildId)) {
+        lastMessage.set(server.guildId, message);
+        isJobRunning.set(server.guildId, true);
+
+        const messageCommandActive = `I'll send you the Nasa Astronomy Picture of the Day every day at 8:00AM. To stop, type \`${PREFIX}autopod stop\`.`;
+        sendMessage(server, messageCommandActive);
     } else {
-        message.channel.send(
-            `\`${PREFIX}autopod\` is already active in the channel ${
-                lastMessage.get(message.guildId).channel
-            }.`
-        );
+        const messageAlreadyActive = `\`${PREFIX}autopod\` is already active in the channel ${
+            lastMessage.get(server.guildId).channel
+        }.`;
+        sendMessage(server, messageAlreadyActive);
     }
 };
 
-const stopAutoPicture = (message) => {
-    if (isJobRunning.get(message.guildId)) {
-        message.channel.send(
-            "I won't send you the Nasa Astronomy Picture of the Day anymore."
-        );
-        isJobRunning.set(message.guildId, false);
+const stopAutoPicture = (server) => {
+    if (isJobRunning.get(server.guildId)) {
+        const messageStopCommand =
+            "I won't send you the Nasa Astronomy Picture of the Day anymore.";
+        sendMessage(server, messageStopCommand);
+
+        isJobRunning.set(server.guildId, false);
     } else {
-        message.channel.send(`\`${PREFIX}autopod\` is not running.`);
+        const messageNotRunning = `\`${PREFIX}autopod\` is not running.`;
+        sendMessage(server, messageNotRunning);
     }
 };
 
