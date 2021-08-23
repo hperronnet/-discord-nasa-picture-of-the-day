@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PREFIX } = process.env;
+const { sendMessage } = require('../util/messageUtil.js');
 
 const {
     startAutoPicture,
@@ -13,19 +14,18 @@ module.exports = {
             `shows Nasa Astronomy Picture of The Day, every day at 8:00AM (EDT).`
         ),
 
-    async execute(message, args) {
+    async execute(server, args) {
         if (args.length === 0 || !['start', 'stop'].includes(args[0])) {
             // TODO create generic error like `wrongCommandError(name) => ${name} isn't used like that. Type !help ${name} for more details.`
-            message.channel.send(
-                `\`${PREFIX}autopod\` isn\'t used like that. Type \`${PREFIX}help autopod\` for more details.`
-            );
+            const wrongUsageMessage = `\`${PREFIX}autopod\` isn\'t used like that. Type \`${PREFIX}help autopod\` for more details.`;
+            sendMessage(server, wrongUsageMessage)
             return;
         }
 
         if (args[0] === 'start') {
-            startAutoPicture(message);
+            startAutoPicture(server);
         } else if (args[0] === 'stop') {
-            stopAutoPicture(message);
+            stopAutoPicture(server);
         }
     },
 };
