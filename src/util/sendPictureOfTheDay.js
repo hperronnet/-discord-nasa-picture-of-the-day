@@ -27,9 +27,18 @@ const sendPictureOfTheDay = async (server, args) => {
     const messageResponse = new MessageEmbed()
         .setColor('#195aa8')
         .setTitle(title)
-        .setDescription(explanation)
-        .setImage(res.hdurl)
         .setFooter(footer);
+
+    if (res.media_type === 'image') {
+        messageResponse
+            .setImage(res.hdurl || res.url)
+            .setDescription(explanation);
+    } else {
+        messageResponse
+            .setURL(res.url)
+            .setThumbnail(res.thumbnail_url)
+            .setDescription(explanation + ` ${res.url}`);
+    }
 
     sendEmbedMessage(server, messageResponse);
 };

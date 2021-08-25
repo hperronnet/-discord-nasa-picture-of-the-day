@@ -9,6 +9,7 @@ const getAstronomyPictureOfTheDay = async (date) => {
 			params: {
 				api_key: API_KEY,
 				date,
+				thumbs: true
 			},
 		});
 		return { code: res.status, ...res.data };
