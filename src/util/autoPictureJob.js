@@ -1,22 +1,22 @@
 const CronJob = require('cron').CronJob;
 const { PREFIX } = process.env;
-const { sendPictureOfTheDay } = require('../util/sendPictureOfTheDay.js');
-const { sendMessage } = require('../util/messageUtil.js');
+const { sendPictureOfTheDay } = require('../util/sendPictureOfTheDay');
+const { sendMessage } = require('../util/messageUtil');
+const GuildSchema = require('../schemas/guildSchema');
 
-let autoPictureJob;
-let isJobRunning = new Map();
-let lastMessage = new Map();
-
-const initialiseAutoPictureJob = () => {
+const initialiseAutoPictureJob = (client) => {
     autoPictureJob = new CronJob(
         '00 00 8 * * *',
-        () => {
-            lastMessage.forEach((server, guildId) => {
-                if (isJobRunning.get(guildId)) {
+        async () => {
+            const guilds = await GuildSchema.find();
+
+            guilds.forEach(async (guild) => {
+                const channel = await client.channels.fetch(guild.channelId);
+                if (guild.apodActivated) {
                     console.log(
-                        `Sending Nasa Astronomy Picture of the Day for server ${guildId}`
+                        `Sending Nasa Astronomy Picture of the Day for server ${guild.guildId}`
                     );
-                    sendPictureOfTheDay(server, []);
+                    sendPictureOfTheDay(channel, []);
                 }
             });
         },
@@ -26,31 +26,60 @@ const initialiseAutoPictureJob = () => {
     );
 };
 
-const startAutoPicture = (server) => {
-    if (!isJobRunning.get(server.guildId)) {
-        lastMessage.set(server.guildId, server);
-        isJobRunning.set(server.guildId, true);
+const startAutoPicture = async (server, client) => {
+    let guildInDB = await GuildSchema.findOne({ guildId: server.guildId });
+
+    if (!guildInDB) {
+        guildInDB = await new GuildSchema({
+            guildId: server.guildId,
+            apodActivated: false,
+            channelId: ' ',
+        }).save();
+    }
+
+    if (!guildInDB.apodActivated) {
+        await GuildSchema.findOneAndUpdate(
+            {
+                guildId: server.guildId,
+            },
+            {
+                $set: {
+                    apodActivated: true,
+                    channelId: server.channelId,
+                },
+            }
+        );
 
         const messageCommandActive = `I'll send you the Nasa Astronomy Picture of the Day every day at 8:00AM. To stop, type \`${PREFIX}autopod stop\`.`;
-        sendMessage(server, messageCommandActive);
+        sendMessage(server.channel, messageCommandActive);
     } else {
-        const messageAlreadyActive = `\`${PREFIX}autopod\` is already active in the channel ${
-            lastMessage.get(server.guildId).channel
-        }.`;
-        sendMessage(server, messageAlreadyActive);
+        const channel = await client.channels.fetch(guildInDB.channelId);
+        const messageAlreadyActive = `\`${PREFIX}autopod\` is already active in the channel ${channel}.`;
+        sendMessage(server.channel, messageAlreadyActive);
     }
 };
 
-const stopAutoPicture = (server) => {
-    if (isJobRunning.get(server.guildId)) {
+const stopAutoPicture = async (server, client) => {
+    let guildInDB = await GuildSchema.findOne({ guildId: server.guildId });
+
+    if (guildInDB && guildInDB.apodActivated) {
         const messageStopCommand =
             "I won't send you the Nasa Astronomy Picture of the Day anymore.";
-        sendMessage(server, messageStopCommand);
+        sendMessage(server.channel, messageStopCommand);
 
-        isJobRunning.set(server.guildId, false);
+        await GuildSchema.findOneAndUpdate(
+            {
+                guildId: server.guildId,
+            },
+            {
+                $set: {
+                    apodActivated: false,
+                },
+            }
+        );
     } else {
         const messageNotRunning = `\`${PREFIX}autopod\` is not running.`;
-        sendMessage(server, messageNotRunning);
+        sendMessage(server.channel, messageNotRunning);
     }
 };
 

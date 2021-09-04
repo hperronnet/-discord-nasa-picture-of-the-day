@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PREFIX } = process.env;
-const { sendMessage } = require('../util/messageUtil.js');
+const { sendMessage } = require('../util/messageUtil');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,6 +15,6 @@ module.exports = {
 
         commandString += `\nType \`${PREFIX}help commandName\` for a detailed explanation about a command. Ex: \`!help pod\`.`;
 
-        sendMessage(server, commandString);
+        sendMessage(server.channel, commandString);
     },
 };

@@ -1,22 +1,22 @@
 const { MessageEmbed } = require('discord.js');
-const { getAstronomyPictureOfTheDay } = require('../api.js');
+const { getAstronomyPictureOfTheDay } = require('../api');
 const moment = require('moment');
-const { isValidDate } = require('../util/dateUtil.js');
+const { isValidDate } = require('../util/dateUtil');
 const { PREFIX } = process.env;
-const { sendMessage, sendEmbedMessage } = require('./messageUtil.js');
+const { sendMessage, sendEmbedMessage } = require('./messageUtil');
 
-const sendPictureOfTheDay = async (server, args) => {
+const sendPictureOfTheDay = async (channel, args) => {
     const date = args.length === 0 ? moment().format('YYYY-MM-DD') : args[0];
     if (!isValidDate(date.toString())) {
         const messageInvalidParameter = `The given parameter is invalid. Type \`${PREFIX}help pod\` for more details.`;
-        sendMessage(server, messageInvalidParameter);
+        sendMessage(channel, messageInvalidParameter);
         return;
     }
 
     const res = await getAstronomyPictureOfTheDay(date);
 
     if (res.code !== 200) {
-        sendMessage(server, res.msg);
+        sendMessage(channel, res.msg);
         return;
     }
 
@@ -31,7 +31,18 @@ const sendPictureOfTheDay = async (server, args) => {
         .setImage(res.hdurl)
         .setFooter(footer);
 
-    sendEmbedMessage(server, messageResponse);
+    if (res.media_type === 'image') {
+        messageResponse
+            .setImage(res.hdurl || res.url)
+            .setDescription(explanation);
+    } else {
+        messageResponse
+            .setURL(res.url)
+            .setThumbnail(res.thumbnail_url)
+            .setDescription(explanation + ` ${res.url}`);
+    }
+
+    sendEmbedMessage(channel, messageResponse);
 };
 
 module.exports = { sendPictureOfTheDay };
