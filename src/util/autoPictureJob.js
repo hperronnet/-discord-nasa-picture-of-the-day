@@ -11,7 +11,11 @@ const initialiseAutoPictureJob = (client) => {
             const guilds = await GuildSchema.find();
 
             guilds.forEach(async (guild) => {
-                const channel = await client.channels.fetch(guild.channelId);
+                const channel = await client.channels.fetch(guild.channelId).catch((error) => {
+                    console.log(
+                        `Error while fetching channel ${guild.guildId}. Message : ${error.message}`
+                    );
+                });
                 if (guild.apodActivated) {
                     console.log(
                         `Sending Nasa Astronomy Picture of the Day for server ${guild.guildId}`
