@@ -24,7 +24,6 @@ module.exports = {
 
 	async execute(interaction, client) {
 		const option = interaction.options.get('choice')?.value;
-		console.log(option);
 
 		if (option === undefined) {
 			// TODO create generic error like `wrongCommandError(name) => ${name} isn't used like that. Type !help ${name} for more details.`
