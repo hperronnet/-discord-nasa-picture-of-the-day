@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:16.6.2
+FROM node:latest
 ENV NODE_ENV=production
 
 RUN git clone https://github.com/hperronnet/discord-nasa-picture-of-the-day.git
