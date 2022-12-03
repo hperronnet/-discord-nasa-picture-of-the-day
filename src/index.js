@@ -6,15 +6,15 @@ const { startDB } = require('./mongo');
 const { BOT_TOKEN } = process.env;
 
 const intents = [
-	Discord.Intents.FLAGS.GUILDS,
-    Discord.Intents.FLAGS.GUILD_MESSAGES,
+	Discord.GatewayIntentBits.Guilds,
+	Discord.GatewayIntentBits.GuildMessages,
 ];
 const client = new Discord.Client({ intents });
 client.commands = new Discord.Collection();
-client.events = new Discord.Collection();
+client.commandArray = [];
 
-['command_handler', 'event_handler'].forEach((file) => {
-	require(`./handlers/${file}`)(Discord, client);
+['commandHandler', 'eventHandler'].forEach((file) => {
+	require(`./handlers/${file}`)(client);
 });
 
 // Connecting to Database

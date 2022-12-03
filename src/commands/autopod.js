@@ -1,31 +1,43 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const { PREFIX } = process.env;
 const { sendMessage } = require('../util/messageUtil');
 
 const {
-    startAutoPicture,
-    stopAutoPicture,
+	startAutoPicture,
+	stopAutoPicture,
 } = require('../util/autoPictureJob');
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('autopod')
-        .setDescription(
-            `shows Nasa Astronomy Picture of The Day, every day at 8:00AM (EDT).`
-        ),
+	data: new SlashCommandBuilder()
+		.setName('autopod')
+		.setDescription(
+			'shows Nasa Astronomy Picture of The Day, every day at 8:00AM (EDT).',
+		)
+		.addStringOption(option =>
+			option.setName('choice')
+				.setDescription('start to activate, stop to deactivate')
+				.setRequired(true)
+				.addChoices(
+					{ name: 'start', value: 'start' },
+					{ name: 'stop', value: 'stop' },
+				)),
 
-    async execute(server, args, client) {
-        if (args.length === 0 || !['start', 'stop'].includes(args[0])) {
-            // TODO create generic error like `wrongCommandError(name) => ${name} isn't used like that. Type !help ${name} for more details.`
-            const wrongUsageMessage = `\`${PREFIX}autopod\` isn\'t used like that. Type \`${PREFIX}help autopod\` for more details.`;
-            sendMessage(server.channel, wrongUsageMessage)
-            return;
-        }
+	async execute(interaction, client) {
+		const option = interaction.options.get('choice')?.value;
+		console.log(option);
 
-        if (args[0] === 'start') {
-            startAutoPicture(server, client);
-        } else if (args[0] === 'stop') {
-            stopAutoPicture(server, client);
-        }
-    },
+		if (option === undefined) {
+			// TODO create generic error like `wrongCommandError(name) => ${name} isn't used like that. Type !help ${name} for more details.`
+			const wrongUsageMessage = `\`${PREFIX}autopod\` isn't used like that. Type \`${PREFIX}help autopod\` for more details.`;
+			sendMessage(interaction, wrongUsageMessage);
+			return;
+		}
+
+		if (option === 'start') {
+			startAutoPicture(interaction, client);
+		}
+		else if (option === 'stop') {
+			stopAutoPicture(interaction, client);
+		}
+	},
 };

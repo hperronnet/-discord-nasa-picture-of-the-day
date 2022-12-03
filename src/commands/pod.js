@@ -1,13 +1,17 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { sendPictureOfTheDay } = require("../util/sendPictureOfTheDay");
+const { SlashCommandBuilder } = require('discord.js');
+const { sendPictureOfTheDay } = require('../util/sendPictureOfTheDay');
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("pod")
-        .setDescription("shows Nasa Astronomy Picture of The Day."),
-    async execute(message, args) {
-        // Command without parameter = Today's date by default
-        console.log(`Sending pod for ${message.channel.guildId}`);
-        sendPictureOfTheDay(message.channel, args);
-    },
+	data: new SlashCommandBuilder()
+		.setName('pod')
+		.setDescription('shows Nasa Astronomy Picture of The Day.')
+		.addStringOption(option =>
+			option.setName('date')
+				.setDescription('The date of the picture you want. Leave empty if you want today\'s picture')),
+
+	async execute(interaction) {
+		// Command without parameter = Today's date by default
+		console.log(`Sending pod for ${interaction.channel.guildId}`);
+		sendPictureOfTheDay(interaction);
+	},
 };

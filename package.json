@@ -14,17 +14,18 @@
     "type": "git",
     "url": "git+https://gitlab.com/hperronnet/discord-nasa-picture-of-the-day.git"
   },
-  "author": "",
+  "author": "Hugo Perronnet",
   "license": "ISC",
   "bugs": {
     "url": "https://gitlab.com/hperronnet/discord-nasa-picture-of-the-day/issues"
   },
   "homepage": "https://gitlab.com/hperronnet/discord-nasa-picture-of-the-day#readme",
   "dependencies": {
-    "@discordjs/builders": "^0.5.0",
+    "@discordjs/rest": "^1.4.0",
     "axios": "^0.21.1",
     "cron": "^1.8.2",
-    "discord.js": "^13.1.0",
+    "discord-api-types": "^0.37.20",
+    "discord.js": "^14.7.1",
     "dotenv": "^10.0.0",
     "moment": "^2.29.1",
     "mongoose": "^6.0.4"
