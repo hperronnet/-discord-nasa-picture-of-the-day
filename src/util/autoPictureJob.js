@@ -1,7 +1,7 @@
 const CronJob = require('cron').CronJob;
 const { PREFIX } = process.env;
-const { sendPictureOfTheDay } = require('../util/sendPictureOfTheDay');
-const { sendMessage } = require('../util/messageUtil');
+const { sendAutoPod } = require('../util/sendPictureOfTheDay');
+const { sendReply } = require('../util/messageUtil');
 const GuildSchema = require('../schemas/guildSchema');
 
 const initialiseAutoPictureJob = (client) => {
@@ -18,11 +18,11 @@ const initialiseAutoPictureJob = (client) => {
 						`Error while fetching channel ${guild.guildId}. Message : ${error.message}`,
 					);
 				});
-				if (guild.apodActivated) {
+				if (channel && guild.apodActivated) {
 					console.log(
-						`Sending Nasa Astronomy Picture of the Day for server ${guild.guildId}`,
+						`Autopod - Sending Nasa Astronomy Picture of the Day for server ${guild.guildId}`,
 					);
-					sendPictureOfTheDay(channel, []);
+					sendAutoPod(channel, guild.channelId);
 				}
 			});
 		},
@@ -57,22 +57,22 @@ const startAutoPicture = async (server, client) => {
 		);
 
 		const messageCommandActive = `I'll send you the Nasa Astronomy Picture of the Day every day at 8:00AM. To stop, type \`${PREFIX}autopod stop\`.`;
-		sendMessage(server, messageCommandActive);
+		sendReply(server, messageCommandActive);
 	}
 	else {
 		const channel = await client.channels.fetch(guildInDB.channelId);
 		const messageAlreadyActive = `\`${PREFIX}autopod\` is already active in the channel ${channel}.`;
-		sendMessage(server, messageAlreadyActive);
+		sendReply(server, messageAlreadyActive);
 	}
 };
 
-const stopAutoPicture = async (server, client) => {
+const stopAutoPicture = async (server) => {
 	const guildInDB = await GuildSchema.findOne({ guildId: server.guildId });
 
 	if (guildInDB && guildInDB.apodActivated) {
 		const messageStopCommand =
             'I won\'t send you the Nasa Astronomy Picture of the Day anymore.';
-		sendMessage(server, messageStopCommand);
+		sendReply(server, messageStopCommand);
 
 		await GuildSchema.findOneAndUpdate(
 			{
@@ -87,7 +87,7 @@ const stopAutoPicture = async (server, client) => {
 	}
 	else {
 		const messageNotRunning = `\`${PREFIX}autopod\` is not running.`;
-		sendMessage(server, messageNotRunning);
+		sendReply(server, messageNotRunning);
 	}
 };
 

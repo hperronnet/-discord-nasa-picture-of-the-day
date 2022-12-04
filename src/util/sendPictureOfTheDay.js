@@ -3,22 +3,45 @@ const { getAstronomyPictureOfTheDay } = require('../api');
 const moment = require('moment');
 const { isValidDate } = require('../util/dateUtil');
 const { PREFIX } = process.env;
-const { sendMessage, sendEmbedMessage } = require('./messageUtil');
+const { sendReply, sendReplyEmbed, sendEmbed } = require('./messageUtil');
 
 const sendPictureOfTheDay = async (interaction) => {
 	const date = interaction.options.get('date')?.value ?? moment().format('YYYY-MM-DD');
 	if (!isValidDate(date.toString())) {
 		const messageInvalidParameter = `The given parameter is invalid. Type \`${PREFIX}help pod\` for more details.`;
-		sendMessage(interaction, messageInvalidParameter);
+		sendReply(interaction, messageInvalidParameter);
 		return;
 	}
 
 	const res = await getAstronomyPictureOfTheDay(date);
 
 	if (res.code !== 200) {
-		sendMessage(interaction, res.msg);
+		sendReply(interaction, res.msg);
 		return;
 	}
+
+	const messageResponse = formatPod(res);
+
+	sendReplyEmbed(interaction, messageResponse);
+};
+
+const sendAutoPod = async (channel, channelId) => {
+	const date = moment().format('YYYY-MM-DD');
+
+	const res = await getAstronomyPictureOfTheDay(date);
+
+	if (res.code !== 200) {
+		sendEmbed(channel, res.msg);
+		return;
+	}
+
+	const messageResponse = formatPod(res);
+
+
+	sendEmbed(channel, channelId, messageResponse);
+};
+
+const formatPod = (res) => {
 
 	const title = `**${res.title}** \n\n`;
 	const explanation = `*${res.explanation}* \n`;
@@ -53,7 +76,7 @@ const sendPictureOfTheDay = async (interaction) => {
 			.setDescription(explanation + ` ${res.url}`);
 	}
 
-	sendEmbedMessage(interaction, messageResponse);
+	return messageResponse;
 };
 
-module.exports = { sendPictureOfTheDay };
+module.exports = { sendPictureOfTheDay, sendAutoPod };

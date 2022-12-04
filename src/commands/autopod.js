@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { PREFIX } = process.env;
-const { sendMessage } = require('../util/messageUtil');
+const { sendReply } = require('../util/messageUtil');
 
 const {
 	startAutoPicture,
@@ -28,7 +28,7 @@ module.exports = {
 		if (option === undefined) {
 			// TODO create generic error like `wrongCommandError(name) => ${name} isn't used like that. Type !help ${name} for more details.`
 			const wrongUsageMessage = `\`${PREFIX}autopod\` isn't used like that. Type \`${PREFIX}help autopod\` for more details.`;
-			sendMessage(interaction, wrongUsageMessage);
+			sendReply(interaction, wrongUsageMessage);
 			return;
 		}
 
@@ -36,7 +36,7 @@ module.exports = {
 			startAutoPicture(interaction, client);
 		}
 		else if (option === 'stop') {
-			stopAutoPicture(interaction, client);
+			stopAutoPicture(interaction);
 		}
 	},
 };

@@ -1,5 +1,5 @@
 const { PREFIX } = process.env;
-const { sendMessage } = require('../util/messageUtil');
+const { sendReply } = require('../util/messageUtil');
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
@@ -15,6 +15,6 @@ module.exports = {
 
 		commandString += `\nType \`${PREFIX}help commandName\` for a detailed explanation about a command. Ex: \`!help pod\`.`;
 
-		sendMessage(interaction, commandString);
+		sendReply(interaction, commandString);
 	},
 };

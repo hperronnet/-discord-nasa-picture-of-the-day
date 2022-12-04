@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { PREFIX } = process.env;
 const { DESCRIPTIONS } = require('../constants/detailedDescriptions');
-const { sendMessage } = require('../util/messageUtil');
+const { sendReply } = require('../util/messageUtil');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -24,7 +24,7 @@ module.exports = {
 
 		if (!option) {
 			const helpDetailMessage = `You have to specify the command you need help about. Type \`${PREFIX}nasa\` for the list of all commands.`;
-			sendMessage(interaction, helpDetailMessage);
+			sendReply(interaction, helpDetailMessage);
 			return;
 		}
 
@@ -35,13 +35,13 @@ module.exports = {
 
 		if (!commandNames.includes(option)) {
 			const commandNotFoundMessage = `Command not found. Type \`${PREFIX}nasa\` for the list of all commands.`;
-			sendMessage(interaction, commandNotFoundMessage);
+			sendReply(interaction, commandNotFoundMessage);
 			return;
 		}
 
 		const name = client.commands.get(option).data.name;
 		const description = client.commands.get(option).data.description;
 		const helpMessage = `\`${PREFIX}${name}\` ${description} ${DESCRIPTIONS.get(name)}`;
-		sendMessage(interaction, helpMessage);
+		sendReply(interaction, helpMessage);
 	},
 };
