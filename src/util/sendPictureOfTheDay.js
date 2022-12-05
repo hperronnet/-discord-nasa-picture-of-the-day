@@ -6,7 +6,7 @@ const { PREFIX } = process.env;
 const { sendReply, sendReplyEmbed, sendEmbed } = require('./messageUtil');
 
 const sendPictureOfTheDay = async (interaction) => {
-	const date = interaction.options.get('date')?.value ?? moment().format('YYYY-MM-DD');
+	const date = interaction?.options?.get('date')?.value ?? moment().format('YYYY-MM-DD');
 	if (!isValidDate(date.toString())) {
 		const messageInvalidParameter = `The given parameter is invalid. Type \`${PREFIX}help pod\` for more details.`;
 		sendReply(interaction, messageInvalidParameter);
